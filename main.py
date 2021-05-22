@@ -1,4 +1,4 @@
-"""TP-Link adapter for WebThings Gateway."""
+"""Snapclient Manager addon for WebThings Gateway."""
 
 from os import path
 import functools
