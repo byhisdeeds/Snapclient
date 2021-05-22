@@ -5,7 +5,7 @@ from pyHS100 import SmartDevice, SmartDeviceException
 import threading
 import time
 
-from .tplink_property import TPLinkBulbProperty, TPLinkPlugProperty
+from .snapclient_property import TPLinkBulbProperty, TPLinkPlugProperty
 from .util import hsv_to_rgb
 
 

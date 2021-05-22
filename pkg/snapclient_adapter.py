@@ -3,13 +3,13 @@
 from gateway_addon import Adapter, Database
 from pyHS100 import Discover, SmartBulb, SmartPlug, SmartStrip
 
-from .tplink_device import TPLinkBulb, TPLinkPlug
+from .snapclient_device import TPLinkBulb, TPLinkPlug
 
 
 _TIMEOUT = 3
 
 
-class TPLinkAdapter(Adapter):
+class SnapclientAdapter(Adapter):
     """Adapter for TP-Link smart home devices."""
 
     def __init__(self, verbose=False):

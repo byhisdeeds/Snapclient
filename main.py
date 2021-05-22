@@ -8,7 +8,7 @@ import time
 
 sys.path.append(path.join(path.dirname(path.abspath(__file__)), 'lib'))
 
-from pkg.tplink_adapter import TPLinkAdapter  # noqa
+from pkg.snapclient_adapter import SnapclientAdapter  # noqa
 
 
 _DEBUG = False
@@ -28,7 +28,7 @@ def cleanup(signum, frame):
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, cleanup)
     signal.signal(signal.SIGTERM, cleanup)
-    _ADAPTER = TPLinkAdapter(verbose=_DEBUG)
+    _ADAPTER = SnapclientAdapter(verbose=_DEBUG)
 
     # Wait until the proxy stops running, indicating that the gateway shut us
     # down.
