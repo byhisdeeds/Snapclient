@@ -1,0 +1,2 @@
+# Snapclient
+Snapclient webthings addon
