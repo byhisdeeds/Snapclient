@@ -10,7 +10,7 @@
     }
   },
   "homepage_url": "https://github.com/byhisdeeds/snapclient",
-  "id": "snapclient-addon",
+  "id": "snapclient",
   "license": "MPL-2.0",
   "manifest_version": 1,
   "name": "Snapclient Manager",
