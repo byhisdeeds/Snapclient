@@ -1,6 +1,6 @@
 {
-  "author": "WebThingsIO",
-  "description": "TP-Link Kasa smart plug/bulb adapter plugin for WebThings Gateway",
+  "author": "byhisdeeds",
+  "description": "Snapclient manager addon for WebThings Gateway",
   "gateway_specific_settings": {
     "webthings": {
       "exec": "python3 {path}/main.py",
@@ -9,11 +9,11 @@
       "strict_min_version": "0.10.0"
     }
   },
-  "homepage_url": "https://github.com/WebThingsIO/tplink-adapter",
-  "id": "tplink-adapter",
+  "homepage_url": "https://github.com/byhisdeeds/snapclient",
+  "id": "snapclient-addon",
   "license": "MPL-2.0",
   "manifest_version": 1,
-  "name": "TP-Link Kasa",
+  "name": "Snapclient Manager",
   "options": {
     "default": {
       "addresses": []
@@ -33,6 +33,6 @@
       }
     }
   },
-  "short_name": "TP-Link Kasa",
+  "short_name": "Snapclient",
   "version": "0.6.3"
 }
