@@ -1,7 +1,8 @@
-"""TP-Link adapter for WebThings Gateway."""
+"""Snapclient Property for WebThings Gateway."""
 
 from gateway_addon import Property
 from pyHS100 import SmartDeviceException
+from .snapserver import SnapServer
 
 from .util import hsv_to_rgb, rgb_to_hsv
 
@@ -183,25 +184,15 @@ class SnapClientProperty(Property):
 
         value -- the value to set
         """
-        # print("@@@@@ PROPERTY SET-VALUE", self.name, value)
-        # color_mode_prop = None
-        # if 'colorMode' in self.device.properties:
-        #     color_mode_prop = self.device.properties['colorMode']
-        #
-        # level_prop = None
-        # if 'level' in self.device.properties:
-        #     level_prop = self.device.properties['level']
-
         try:
-            if self.name == 'on':
-                print("$$$ PROPERTY SET ON STATE:", value)
-                self.device.notify_property_changed(self.device.properties['on'])
-            elif self.name == 'muted':
-                print("$$$ PROPERTY SET MUTED STATE:", value)
-                self.device.notify_property_changed(self.device.properties['muted'])
+            if self.name == 'muted':
+                print("$$$ PROPERTY SET MUTED STATE:", value, self.device.adapter.server_address)
+                SnapServer.set_client_property(self.device.adapter.server_address, self.device.id, self.name, value)
+                # self.device.notify_property_changed(self.device.properties['muted'])
             elif self.name == 'level':
-                print("$$$ PROPERTY SET VOLUME LEVEL STATE:", value)
-                self.device.notify_property_changed(self.device.properties['level'])
+                print("$$$ PROPERTY SET VOLUME LEVEL STATE:", value, self.device.adapter.server_address)
+                SnapServer.set_client_property(self.device.adapter.server_address, self.device.id, self.name, value)
+                # self.device.notify_property_changed(self.device.properties['level'])
             else:
                 return
         except SmartDeviceException:

@@ -1,9 +1,7 @@
 """TP-Link adapter for WebThings Gateway."""
 
-from gateway_addon import Adapter, Database, IpcClient
-from pyHS100 import Discover, SmartBulb, SmartPlug, SmartStrip
-
-from .snapclient_device import SnapClientPlayer, TPLinkBulb, TPLinkPlug
+from gateway_addon import Adapter, Database
+from .snapclient_device import SnapClientPlayer
 from .snapserver import Clients, SnapServer
 
 
@@ -26,9 +24,7 @@ class SnapclientAdapter(Adapter):
                          'snapclient',
                          verbose=verbose)
 
-        # self.manager_proxy = SnapclientAddonManagerProxy(self.package_name, verbose=verbose)
-        # self.manager_proxy.add_property_change_listener(self.on_property_change_listener)
-
+        self.server_address = ""
         self.server = None
         self.pairing = False
         self.start_pairing(_TIMEOUT)
@@ -42,25 +38,24 @@ class SnapclientAdapter(Adapter):
         config = database.load_config()
         database.close()
 
-        if not config or 'addresses' not in config:
+        if not config or 'snapserver' not in config:
             return
 
-        for address in config['addresses']:
-            print("===ADDRESSES===", address)
-            try:
-                self.server = SnapServer(host=address, timeout=_TIMEOUT) if self.server is None else self.server
-                # servers = Clients.discover(host=address, timeout=_TIMEOUT)
-                servers = self.server.get_status(server=address)
-                if "result" in servers:
-                    if "server" in servers["result"] and "groups" in servers["result"]["server"]:
-                        for group in servers["result"]["server"]["groups"]:
-                            for client in group["clients"]:
-                                print("@@@@@@@@ CLIENT: ", client)
-                                if self.pairing:
-                                    self._add_device(client)
-            except (OSError, UnboundLocalError) as e:
-                print('Failed to connect to {}: {}'.format(address, e))
-                continue
+        self.server_address = config['snapserver']
+        print("===SNAPSERVER ADDRESS===", self.server_address)
+        try:
+            self.server = SnapServer(host=self.server_address, timeout=_TIMEOUT) if self.server is None else self.server
+            servers = self.server.get_status(server=self.server_address)
+            if "result" in servers:
+                if "server" in servers["result"] and "groups" in servers["result"]["server"]:
+                    for group in servers["result"]["server"]["groups"]:
+                        for client in group["clients"]:
+                            print("@@@@@@@@ CLIENT: ", client)
+                            if self.pairing:
+                                self._add_device(client)
+        except (OSError, UnboundLocalError) as e:
+            print('Failed to connect to {}: {}'.format(address, e))
+            pass
 
     def start_pairing(self, timeout):
         """
@@ -97,22 +92,3 @@ class SnapclientAdapter(Adapter):
     def cancel_pairing(self):
         """Cancel the pairing process."""
         self.pairing = False
-
-    def get_client_status(self, id):
-        result = {}
-        print("!!!!!!!!!!!!!!!!!!! STATUS - ID", id)
-        if self.server:
-            try:
-                result = self.server.get_status(client=id)
-                print(">>>>>>>>>", result)
-            except (OSError, UnboundLocalError) as e:
-                print('Failed to connect to {}: {}'.format(address, e))
-            return result
-
-    def on_property_change_listener(self, msg):
-        """Read a message from the IPC socket."""
-        # if self.verbose:
-        #     print('AddonManagerProxy: recv:', msg)
-
-        # msg_type = msg['messageType']
-        print("++++++++DEVICE_PROPERTY_CHANGED_NOTIFICATION++++++++", msg["data"])

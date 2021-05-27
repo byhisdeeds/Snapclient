@@ -45,6 +45,48 @@ class SnapServer:
             print("Got exception %s", ex, exc_info=True)
         return status
 
+    @staticmethod
+    def set_client_property(host, client, name, value):
+        tn = telnetlib.Telnet(host, 1705, 5)
+        if name == 'level':
+            rq = {
+                "jsonrpc": "2.0",
+                "method": "Client.SetVolume",
+                "params": {
+                    "id": client.replace("snapclient-", ""),
+                    "volume": {
+                        "percent": value
+                    }
+                },
+                "id": 2
+            }
+        elif name == 'muted':
+            rq = {
+                "jsonrpc": "2.0",
+                "method": "Client.SetVolume",
+                "params": {
+                    "id": client.replace("snapclient-", ""),
+                    "volume": {
+                        "muted": value
+                    }
+                },
+                "id": 2
+            }
+        else:
+            return
+
+        tn.write((json.dumps(rq)+'\n').encode('ascii'))
+        # try:
+        #     print("++++")
+        #     print(json.loads(self.tn.read_until('\n'.encode('ascii'), timeout=5)))
+        #     print("----")
+        # except socket.timeout:
+        #     print("Got socket timeout, which is okay.")
+        # except Exception as ex:
+        #     print("Got exception %s", ex, exc_info=True)
+
+        tn.close()
+
 
 class Clients:
 
