@@ -28,12 +28,12 @@ class SnapClientPlayer(Device):
         self.index = index
         self._type.extend(['SnapClient Player'])
         self.mac = dev["host"]["mac"] if "host" in dev and "mac" in dev["host"] else False
-        self.name = dev["host"]["name"] if "host" in dev and "name" in dev["host"] else False
-        self.description = dev["host"]["ip"] if "host" in dev and "ip" in dev["host"] else False
-        connected = dev["connected"] if "connected" in dev else False
-        muted = dev["config"]["volume"]["muted"] if "config" in dev and "volume" in dev["config"] and "muted" in dev["config"]["volume"] else False
-        volume = dev["config"]["volume"]["percent"] if "config" in dev and "volume" in dev["config"] and "percent" in dev["config"]["volume"] else 0
-        sysinfo = dev["host"] if "host" in dev else {}
+        self.description = dev["host"]["ip"] if "host" in dev and "ip" in dev["host"] else "unknown"
+        self.name = dev["host"]["name"] if "host" in dev and "name" in dev["host"] else self.description
+        # connected = dev["connected"] if "connected" in dev else False
+        # muted = dev["config"]["volume"]["muted"] if "config" in dev and "volume" in dev["config"] and "muted" in dev["config"]["volume"] else False
+        # volume = dev["config"]["volume"]["percent"] if "config" in dev and "volume" in dev["config"] and "percent" in dev["config"]["volume"] else 0
+        # sysinfo = dev["host"] if "host" in dev else {}
 
         self.properties['level'] = SnapClientProperty(
             self,
