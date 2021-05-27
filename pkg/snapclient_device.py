@@ -1,11 +1,11 @@
-"""TP-Link adapter for WebThings Gateway."""
+"""Snapclient adapter for WebThings Gateway."""
 
 from gateway_addon import Device
 from pyHS100 import SmartDevice, SmartDeviceException
 import threading
 import time
 
-from .snapclient_property import TPLinkBulbProperty, TPLinkPlugProperty
+from .snapclient_property import SnapClientProperty, TPLinkBulbProperty, TPLinkPlugProperty
 from .util import hsv_to_rgb
 
 
@@ -523,3 +523,193 @@ class TPLinkBulb(TPLinkDevice):
             light_state = light_state['dft_on_state']
 
         return int(light_state['brightness'])
+
+
+# class SnapClientDevice:
+#     """SnapClient device type."""
+#
+#     def __init__(self, adapter, _id, dev, index=-1):
+#         """
+#         Initialize the object.
+#
+#         adapter -- the Adapter managing this device
+#         _id -- ID of this device
+#         hs100_dev -- the pyHS100 device object to initialize from
+#         index -- index inside parent device
+#         """
+#         # Device.__init__(self, adapter, _id)
+#         self.adapter = adapter
+#         self.id = _id
+#         self._type = []
+#
+#         self.hs100_dev = dev
+#         self.index = index
+#         self.description = dev.sys_info['model']
+#
+#         if index >= 0:
+#             self.name = dev.sys_info['children'][index]['alias']
+#         else:
+#             self.name = dev.sys_info['alias']
+#
+#         if not self.name:
+#             self.name = self.description
+#
+#         t = threading.Thread(target=self.poll)
+#         t.daemon = True
+#         t.start()
+#
+#     @staticmethod
+#     def power(emeter):
+#         """
+#         Determine the current power usage, in watts.
+#
+#         emeter -- current emeter dict for the device
+#         """
+#         if 'power' in emeter:
+#             return emeter['power']
+#
+#         if 'power_mw' in emeter:
+#             return emeter['power_mw'] / 1000
+#
+#         return None
+#
+#     @staticmethod
+#     def voltage(emeter):
+#         """
+#         Determine the current voltage, in volts.
+#
+#         emeter -- current emeter dict for the device
+#         """
+#         if 'voltage' in emeter:
+#             return emeter['voltage']
+#
+#         if 'voltage_mv' in emeter:
+#             return emeter['voltage_mv'] / 1000
+#
+#         return None
+#
+#     @staticmethod
+#     def current(emeter):
+#         """
+#         Determine the current current, in amperes.
+#
+#         emeter -- current emeter dict for the device
+#         """
+#         if 'current' in emeter:
+#             return emeter['current']
+#
+#         if 'current_ma' in emeter:
+#             return emeter['current_ma'] / 1000
+#
+#         return None
+
+
+class SnapClientPlayer(Device):
+    """SnapClient player type."""
+
+    def __init__(self, adapter, _id, dev, index=-1):
+        """
+        Initialize the object.
+
+        adapter -- the Adapter managing this device
+        _id -- ID of this device
+        hs100_dev -- the pyHS100 device object to initialize from
+        index -- index inside parent device
+        """
+        Device.__init__(self, adapter, _id)
+        self.dev = dev
+        self.index = index
+        self._type.extend(['SnapClient Player'])
+        self.mac = dev["host"]["mac"] if "host" in dev and "mac" in dev["host"] else False
+        self.name = dev["host"]["name"] if "host" in dev and "name" in dev["host"] else False
+        self.description = dev["host"]["ip"] if "host" in dev and "ip" in dev["host"] else False
+        state = dev["connected"] if "connected" in dev else False
+        muted = dev["config"]["volume"]["muted"] if "config" in dev and "volume" in dev["config"] and "muted" in dev["config"]["volume"] else False
+        volume = dev["config"]["volume"]["percent"] if "config" in dev and "volume" in dev["config"] and "percent" in dev["config"]["volume"] else 0
+        sysinfo = dev["host"] if "host" in dev else {}
+
+        self.properties['level'] = SnapClientProperty(
+            self,
+            'level',
+            {
+                '@type': 'VolumeProperty',
+                'title': 'Volume',
+                'type': 'integer',
+                'unit': 'percent',
+                'minimum': 0,
+                'maximum': 100,
+            },
+            self.volume(volume)
+        )
+
+        self.properties['on'] = SnapClientProperty(
+            self,
+            'on',
+            {
+                '@type': 'OnOffProperty',
+                'title': 'Connect',
+                'type': 'boolean',
+            },
+            self.is_connected(state)
+        )
+
+        self.properties['muted'] = SnapClientProperty(
+            self,
+            'muted',
+            {
+                '@type': 'OnOffProperty',
+                'title': 'Mute',
+                'type': 'boolean',
+            },
+            self.is_muted(muted)
+        )
+
+        # t = threading.Thread(target=self.poll)
+        # t.daemon = True
+        # t.start()
+
+    def poll(self):
+        """Poll the device for changes."""
+        print("starting device property polling thread for {} with internal {}".format(self.id, _POLL_INTERVAL))
+        while True:
+            time.sleep(_POLL_INTERVAL)
+            try:
+                print("$$$$$$$$$$ POLLING $$$$$$$$$$$$$$$$")
+                status = self.adapter.get_client_status(self.id)
+                print("$$$$$$$$$$ POLLING RESULT $$$$$$$$$$$$$$$$", status)
+
+                for prop in self.properties.values():
+                    prop.update(status)
+            except SmartDeviceException as ee:
+                print(ee)
+
+    @staticmethod
+    def is_connected(connected_state):
+        """
+        Determine whether or not the player is on.
+
+        player_state -- current state of the snapclient player
+        """
+        print("@@@@@@@@@@@@@@@@ SETTING ON VALUE", connected_state)
+        return connected_state
+
+    @staticmethod
+    def is_muted(mute_state):
+        """
+        Determine whether or not the player is on.
+
+        player_state -- current state of the snapclient player
+        """
+        print("@@@@@@@@@@@@@@@@ SETTING MUTED VALUE", mute_state)
+        return mute_state
+
+    @staticmethod
+    def volume(volume_state):
+        """
+        Determine the current volume of the player.
+
+        volume_state -- current level of the player volume
+        """
+        print("@@@@@@@@@@@@@@@@ SETTING VOLUME VALUE", volume_state)
+
+        return int(volume_state)

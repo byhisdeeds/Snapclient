@@ -1,0 +1,35 @@
+{
+  'id': 1,
+  'jsonrpc': '2.0',
+  'result': {
+    'client': {
+      'config': {
+        'instance': 1,
+        'latency': 0,
+        'name': '',
+        'volume': {
+          'muted': False,
+          'percent': 100
+        }
+      },
+      'connected': False,
+      'host': {
+        'arch': 'x86_64',
+        'ip': '192.168.100.91',
+        'mac': '34:2e:b7:f4:5c:4f',
+        'name': 'jp',
+        'os': 'Fedora release 33 (Thirty Three)'
+      },
+      'id': '34:2e:b7:f4:5c:4f',
+      'lastSeen': {
+        'sec': 1621961257,
+        'usec': 507838
+      },
+      'snapclient': {
+        'name': 'Snapclient',
+        'protocolVersion': 2,
+        'version': '0.25.0'
+      }
+    }
+  }
+}

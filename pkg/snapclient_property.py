@@ -155,3 +155,91 @@ class TPLinkBulbProperty(TPLinkProperty):
         if value != self.value:
             self.set_cached_value(value)
             self.device.notify_property_changed(self)
+
+
+# class SnapProperty(Property):
+#     """SnapClient property type."""
+
+
+
+class SnapClientProperty(Property):
+    """Property type for snapclient players."""
+
+    def __init__(self, device, name, description, value):
+        """
+        Initialize the object.
+
+        device -- the Device this property belongs to
+        name -- name of the property
+        description -- description of the property, as a dictionary
+        value -- current value of this property
+        """
+        Property.__init__(self, device, name, description)
+        self.set_cached_value(value)
+
+    def set_value(self, value):
+        """
+        Set the current value of the property.
+
+        value -- the value to set
+        """
+        # print("@@@@@ PROPERTY SET-VALUE", self.name, value)
+        # color_mode_prop = None
+        # if 'colorMode' in self.device.properties:
+        #     color_mode_prop = self.device.properties['colorMode']
+        #
+        # level_prop = None
+        # if 'level' in self.device.properties:
+        #     level_prop = self.device.properties['level']
+
+        try:
+            if self.name == 'on':
+                print("$$$ PROPERTY SET ON STATE:", value)
+                self.device.notify_property_changed(self.device.properties['on'])
+            elif self.name == 'muted':
+                print("$$$ PROPERTY SET MUTED STATE:", value)
+                self.device.notify_property_changed(self.device.properties['muted'])
+            elif self.name == 'level':
+                print("$$$ PROPERTY SET VOLUME LEVEL STATE:", value)
+                self.device.notify_property_changed(self.device.properties['level'])
+            else:
+                return
+        except SmartDeviceException:
+            return
+
+        self.set_cached_value(value)
+        self.device.notify_property_changed(self)
+
+    def update(self, status):
+        """
+        Update the current value, if necessary.
+
+        sysinfo -- current sysinfo dict for the device
+        light_state -- current state of the light
+        emeter -- current emeter for the device
+        """
+        print("%%%% PROPERTY UPDATED: ", self.name, self.value, status)
+        if self.name == 'on':
+            value = status["result"]["client"]["connected"] if "result" in status and\
+                                                               "client" in status["result"] and\
+                                                               "connected" in status["result"]["client"] else False
+        # elif self.name == 'color':
+        #     value = hsv_to_rgb(*self.device.hsv(light_state))
+        # elif self.name == 'level':
+        #     value = self.device.brightness(light_state)
+        # elif self.name == 'colorTemperature':
+        #     value = self.device.color_temp(light_state)
+        # elif self.name == 'colorMode':
+        #     value = self.device.color_mode(light_state)
+        # elif self.name == 'instantaneousPower':
+        #     value = self.device.power(emeter)
+        # elif self.name == 'voltage':
+        #     value = self.device.voltage(emeter)
+        # elif self.name == 'current':
+        #     value = self.device.current(emeter)
+        # else:
+        #     return
+
+        if value != self.value:
+            self.set_cached_value(value)
+            self.device.notify_property_changed(self)

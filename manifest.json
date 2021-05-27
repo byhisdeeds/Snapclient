@@ -16,19 +16,22 @@
   "name": "Snapclient Manager",
   "options": {
     "default": {
-      "addresses": []
+      "snapserver": "",
+      "debug": false
     },
     "schema": {
       "type": "object",
       "required": [
-        "addresses"
+        "snapserver"
       ],
       "properties": {
-        "addresses": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+        "snapserver": {
+          "type": "string"
+        },
+        "debug": {
+          "title": "Enable Debugging",
+          "description": "Enable snapclient debug logging",
+          "type": "boolean"
         }
       }
     }

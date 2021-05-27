@@ -11,7 +11,7 @@ sys.path.append(path.join(path.dirname(path.abspath(__file__)), 'lib'))
 from pkg.snapclient_adapter import SnapclientAdapter  # noqa
 
 
-_DEBUG = False
+_DEBUG = True
 _ADAPTER = None
 
 print = functools.partial(print, flush=True)
